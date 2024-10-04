@@ -36,21 +36,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
     network_plugin    = "kubenet" # azure (CNI)
   }
 }
-resource "azurerm_storage_table_entity" "entiity" {
-  table_name           = var.table_name
-  storage_account_name = var.storage_account_name
-  partition_key        = var.partition_key
-  row_key              = var.row_key
-  entity = {
-    subscription   = var.subscription
-    resourceGroup  = var.resourceGroup
-    storageAccount = var.storageAccount
-    container      = var.container
-    anyTfChanges   = var.anyTfChanges
-    tfstateFile    = var.tfstateFile
-    artifactName   = var.artifactName
-  }
-}
+
 
 
 
