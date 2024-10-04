@@ -51,11 +51,11 @@ steps:
 #      snyk test
 #      snyk monitor
 
-- task: UseDotNet@2
-  inputs:
-    packageType: 'sdk'
-    version: '7.0.100'  # Specify an exact version
-    installationPath: $(Agent.ToolsDirectory)/dotnet
+#- task: UseDotNet@2
+ # inputs:
+  #  packageType: 'sdk'
+   # version: '7.0.100'  # Specify an exact version
+   # installationPath: $(Agent.ToolsDirectory)/dotnet
 
 
 # Run Angular Tests and Build
@@ -94,7 +94,7 @@ steps:
 - task: ArchiveFiles@2
   displayName: 'Archive Artifacts'
   inputs:
-    rootFolderOrFile: '$(Build.SourcesDirectory)/dist/iRED-Web-Portal'
+    rootFolderOrFile: '$(Build.SourcesDirectory)'
     includeRootFolder: false
     archiveType: 'zip'
     archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
