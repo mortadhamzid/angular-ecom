@@ -51,6 +51,12 @@ steps:
 #      snyk test
 #      snyk monitor
 
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    version: '7.x'  # Use the version you require; check the latest version.
+    installationPath: $(Agent.ToolsDirectory)/dotnet
+
 # Run Angular Tests and Build
 - task: Bash@3
   displayName: 'Run Angular Tests and Build'
