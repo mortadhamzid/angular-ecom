@@ -40,6 +40,12 @@ steps:
 #    command: 'custom'
 #    customCommand: 'install -g snyk'
 
+- task: SnykSecurityScan@1
+  inputs:
+    serviceConnectionEndpoint: 'snyk'
+    testType: 'app'
+    monitorWhen: 'always'
+    failOnIssues: true
 # Run Snyk Security Test
 
 #- task: Bash@3
