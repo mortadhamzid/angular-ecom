@@ -114,4 +114,4 @@ steps:
   inputs:
     targetType: 'inline'
     script: |
-      curl -X POST -H 'Content-type: application/json' --data '{"text":"Build $(Build.BuildId) for Angular SPA is successful."}' $SLACK_WEBHOOK_URL
+      curl -X POST -H 'Content-type: application/json' --data '{"text":"Build $(Build.BuildId) for Angular SPA is successful."}' https://app.slack.com/client/T07QJGPAAJ0/D07QG2M9T34
