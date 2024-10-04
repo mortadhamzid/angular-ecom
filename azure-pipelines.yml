@@ -64,8 +64,9 @@ steps:
 - task: reportgenerator@5
   displayName: 'Generate Code Coverage Report'
   inputs:
-    reports: 'coverage\iRED-Web-Portal\cobertura-coverage.xml'
-    targetdir: 'coverage\iRED-Web-Portal\Reports'
+    reports: 'coverage/angular-ecom/lcov.info'  # Adjust 'ecomm-project' to match your actual project folder name
+    targetdir: 'coverage/angular-ecom/Reports'   # Specify where to output the report
+    reporttypes: 'HtmlInline_AzureDevOps;Cobertura' # You can add other report types if needed
 
 # Publish Test Results
 - task: PublishTestResults@2
