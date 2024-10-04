@@ -117,7 +117,7 @@ steps:
      # curl -X POST -H 'Content-type: application/json' --data '{"text":"Build $(Build.BuildId) for Angular SPA is successful."}' https://app.slack.com/client/T07QJGPAAJ0/D07QG2M9T34
 - task: SlackNotification@6
   inputs:
-    SlackApiToken: 'xoxe.xoxp-1-Mi0yLTc4MzQ1NjczNTA2MTItNzgzMjA2NTk4MzQ1OC03ODU1MTE3NjE0NDgwLTc4Mjk0NjM3MTM3NDktYzAxMjhjYmQ4NWUzNjIyMzM1OTQ0ZThhZjMyOTgyZGJlYTI5MjkzMGM3MjI2OTAwN2UwMTg0MzgzZjc1NmExZQ'
+    SlackApiToken: 'xoxe.xoxp-1-Mi0yLTc4MzQ1NjczNTA2MTItNzgzMjA2NTk4MzQ1OC03ODU1MTE3NjE0NDgwLTc4NTUxNzQzNTEzNDQtYTQ5YmZmYWQ2ODliZWZlY2U4MmRlZDk4Mzk5ZDg0MzMxYTI3YmNiOTJiZjdkZWUzMWZlMTViYmYxMGRmMThlNg'
     MessageAuthor: 'Azure DevOps'
     Channel: '#an-angular-project'
     NotificationType: 'ChatMessage'
