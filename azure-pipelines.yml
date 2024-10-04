@@ -60,7 +60,7 @@ steps:
       ng build --configuration production
 
 # Generate Code Coverage Report
-- task: reportgenerator@4
+- task: reportgenerator@5
   displayName: 'Generate Code Coverage Report'
   inputs:
     reports: 'coverage\iRED-Web-Portal\cobertura-coverage.xml'
