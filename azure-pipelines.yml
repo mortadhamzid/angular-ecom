@@ -23,13 +23,14 @@ steps:
   displayName: 'Install Angular CLI 14.1.3'
   inputs:
     command: 'custom'
-    customCommand: 'install -g @angular/cli@14.1.0'
+    customCommand: 'install -g @angular/cli@14.1.3'
 
 # Install Dependencies
 - task: Npm@1
   displayName: 'Install Dependencies'
   inputs:
-    command: 'install'
+    command: 'custom'
+    customCommand: 'install --legacy-peer-deps'
 
 # Install Snyk
 
