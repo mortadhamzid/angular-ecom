@@ -68,27 +68,27 @@ steps:
       ng build --configuration production
 
 # Generate Code Coverage Report
-- task: reportgenerator@5
-  displayName: 'Generate Code Coverage Report'
-  inputs:
-    reports: 'coverage/angular-ecom/lcov.info'  # Adjust 'ecomm-project' to match your actual project folder name
-    targetdir: 'coverage/angular-ecom/Reports'   # Specify where to output the report
-    reporttypes: 'HtmlInline_AzureDevOps;Cobertura' # You can add other report types if needed
+#- task: reportgenerator@5
+ # displayName: 'Generate Code Coverage Report'
+  #inputs:
+   # reports: 'coverage/angular-ecom/lcov.info'  # Adjust 'ecomm-project' to match your actual project folder name
+    #targetdir: 'coverage/angular-ecom/Reports'   # Specify where to output the report
+    #reporttypes: 'HtmlInline_AzureDevOps;Cobertura' # You can add other report types if needed
 
 # Publish Test Results
-- task: PublishTestResults@2
-  displayName: 'Publish Test Results'
-  inputs:
-    testResultsFormat: 'JUnit'
-    testResultsFiles: '$(Build.SourcesDirectory)/reports/junit.xml'
+#- task: PublishTestResults@2
+ # displayName: 'Publish Test Results'
+  #inputs:
+   # testResultsFormat: 'JUnit'
+    #testResultsFiles: '$(Build.SourcesDirectory)/reports/junit.xml'
 
 # Publish Code Coverage
-- task: PublishCodeCoverageResults@1
-  displayName: 'Publish Code Coverage'
-  inputs:
-    codeCoverageTool: 'Cobertura'
-    summaryFileLocation: '$(Build.SourcesDirectory)\coverage\iRED-Web-Portal\cobertura-coverage.xml'
-    reportDirectory: '$(Build.SourcesDirectory)\coverage\iRED-Web-Portal\Reports'
+#- task: PublishCodeCoverageResults@1
+ # displayName: 'Publish Code Coverage'
+ # inputs:
+  #  codeCoverageTool: 'Cobertura'
+   # summaryFileLocation: '$(Build.SourcesDirectory)\coverage\iRED-Web-Portal\cobertura-coverage.xml'
+   # reportDirectory: '$(Build.SourcesDirectory)\coverage\iRED-Web-Portal\Reports'
 
 # Archive Artifacts
 - task: ArchiveFiles@2
