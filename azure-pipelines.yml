@@ -101,17 +101,24 @@ steps:
     replaceExistingArchive: true
 
 # Publish Build Artifacts
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifacts'
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
-    ArtifactName: 'drop'
-    publishLocation: 'Container'
+#- task: PublishBuildArtifacts@1
+ # displayName: 'Publish Artifacts'
+  #inputs:
+   # PathtoPublish: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+    #ArtifactName: 'drop'
+   # publishLocation: 'Container'
 
 # Send Slack Notification
-- task: Bash@3
-  displayName: 'Send Slack Notification'
+#- task: Bash@3
+ # displayName: 'Send Slack Notification'
+  #inputs:
+   # targetType: 'inline'
+    #script: |
+     # curl -X POST -H 'Content-type: application/json' --data '{"text":"Build $(Build.BuildId) for Angular SPA is successful."}' https://app.slack.com/client/T07QJGPAAJ0/D07QG2M9T34
+- task: SlackNotification@6
   inputs:
-    targetType: 'inline'
-    script: |
-      curl -X POST -H 'Content-type: application/json' --data '{"text":"Build $(Build.BuildId) for Angular SPA is successful."}' https://app.slack.com/client/T07QJGPAAJ0/D07QG2M9T34
+    SlackApiToken: 'xoxe.xoxp-1-Mi0yLTc4MzQ1NjczNTA2MTItNzgzMjA2NTk4MzQ1OC03ODU1MTE3NjE0NDgwLTc4Mjk0NjM3MTM3NDktYzAxMjhjYmQ4NWUzNjIyMzM1OTQ0ZThhZjMyOTgyZGJlYTI5MjkzMGM3MjI2OTAwN2UwMTg0MzgzZjc1NmExZQ'
+    MessageAuthor: 'Azure DevOps'
+    Channel: '#an-angular-project'
+    NotificationType: 'ChatMessage'
+    Message: 'tnekna'
