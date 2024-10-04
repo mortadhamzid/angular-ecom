@@ -54,8 +54,9 @@ steps:
 - task: UseDotNet@2
   inputs:
     packageType: 'sdk'
-    version: '7.x'  # Use the version you require; check the latest version.
+    version: '7.0.100'  # Specify an exact version
     installationPath: $(Agent.ToolsDirectory)/dotnet
+
 
 # Run Angular Tests and Build
 - task: Bash@3
