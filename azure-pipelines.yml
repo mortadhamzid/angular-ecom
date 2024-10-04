@@ -1,130 +1,91 @@
-trigger:
+trigger: 
 - main
 
-pool:
-  name: 'Default'
+variables:
+  subscription: Visual Studio Enterprise(5af9f377-83c8-4ec8-8520-953f65104850)
+  resourceGroup: tap-app-1-aks-d
+  storageAccount: tapapp1std
+  container: tfstate
+  anyTfChanges: false
+  tfstateFile: app-1-aks-d.tfstate
+  artifactName: 'variables' 
+  # productRequester : '${{ Build.QueuedBy }}'
+  productVersion: '$(GitVersion.SemVer)'
+  
+jobs: 
+- job: BuildAndTest
+  workspace: 
+    clean: all 
+  pool: default
+  steps: 
+  - checkout: self
+    fetchDepth: 0
+  - task: gitversion/execute@0
+    inputs:
+      azureSubscription: Visual Studio Enterprise(5af9f377-83c8-4ec8-8520-953f65104850)
+      useConfigFile: true 
+      configFilePath: './GitVersion.yml'
+  - script: echo current version is $(productVersion) 
+    displayName: 'Display calculated version' 
+  - task: Bash@3 
+    inputs: 
+      targetType: inline 
+      script: echo "##vso[build.updatebuildnumber]$(SemVer)" 
+    displayName: 'Update build number'
+  - task: CopyFiles@2
+    displayName: Copy files
+    inputs:
+      azureSubscription: Visual Studio Enterprise(5af9f377-83c8-4ec8-8520-953f65104850)
+      SourceFolder: '$(Build.SourcesDirectory)'
+      Contents: '*.json'
+      TargetFolder: '$(Build.ArtifactStagingDirectory)'
+  - task: PublishBuildArtifacts@1
+    displayName:  Publish build artifacts
+    inputs:
+      azureSubscription: Visual Studio Enterprise(5af9f377-83c8-4ec8-8520-953f65104850)
 
-steps:
-# Use Node.js 16
-- task: UseNode@1
-  inputs:
-    version: '16.x'
-  displayName: 'Install Node.js 16'
-
-# Install npm 8 (comes with Node.js 16 by default)
-- task: Npm@1
-  displayName: 'Install npm 8'
-  inputs:
-    command: 'custom'
-    customCommand: 'install -g npm@8'
-
-# Install Angular CLI 14.1.3
-- task: Npm@1
-  displayName: 'Install Angular CLI 14.1.3'
-  inputs:
-    command: 'custom'
-    customCommand: 'install -g @angular/cli@14.1.3'
-
-# Install Dependencies
-- task: Npm@1
-  displayName: 'Install Dependencies'
-  inputs:
-    command: 'custom'
-    customCommand: 'install --legacy-peer-deps'
-
-# Install Snyk
-
-#- task: Npm@1
-#  displayName: 'Install Snyk'
-#  inputs:
-#    command: 'custom'
-#    customCommand: 'install -g snyk'
-
-- task: SnykSecurityScan@1
-  inputs:
-    serviceConnectionEndpoint: 'snyk'
-    testType: 'app'
-    monitorWhen: 'always'
-    failOnIssues: true
-# Run Snyk Security Test
-
-#- task: Bash@3
-#  displayName: 'Run Snyk Security Test'
-#  inputs:
-#    targetType: 'inline'
-#    script: |
-#      snyk auth $SNYK_TOKEN
-#      snyk test
-#      snyk monitor
-
-#- task: UseDotNet@2
- # inputs:
-  #  packageType: 'sdk'
-   # version: '7.0.100'  # Specify an exact version
-   # installationPath: $(Agent.ToolsDirectory)/dotnet
-
-
-# Run Angular Tests and Build
-- task: Bash@3
-  displayName: 'Run Angular Tests and Build'
-  inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      ArtifactName: '$(artifactName)'
+  - task: TerraformInstaller@0
+    displayName: install Terraform 
+    inputs:
+      azureSubscription: Visual Studio Enterprise(5af9f377-83c8-4ec8-8520-953f65104850)
+      terraformVersion: 'latest'
+  - task: TerraformTaskV1@0
+    displayName: terraform init
+    inputs:
+      azureSubscription: Visual Studio Enterprise(5af9f377-83c8-4ec8-8520-953f65104850)
+      provider: 'azurerm'
+      command: 'init'
+      workingDirectory: '$(System.DefaultWorkingDirectory)/storage'
+      backendServiceArm: '$(subscription)'
+      backendAzureRmResourceGroupName: '$(resourceGroup)'
+      backendAzureRmStorageAccountName: '$(storageAccount)'
+      backendAzureRmContainerName: '$(container)'
+      backendAzureRmKey: '$(tfstateFile)'
+  - task: TerraformTaskV1@0
+    displayName: terraform plan -out=tfplan
+    inputs:
+      azureSubscription: Visual Studio Enterprise(5af9f377-83c8-4ec8-8520-953f65104850)
+      provider: 'azurerm'
+      command: 'plan'
+      workingDirectory: '$(System.DefaultWorkingDirectory)/storage'
+      commandOptions: '-out=tfplan'
+      # commandOptions: '-detailed-exitcode -out=tfplan'
+      environmentServiceNameAzureRM: '$(subscriptionName)'
+  - task: TerraformTaskV1@0
+    displayName: terraform apply tfplan
+    condition: eq(variables.anyTfChanges, true)
+    inputs:
+      azureSubscription: Visual Studio Enterprise(5af9f377-83c8-4ec8-8520-953f65104850)
+      provider: 'azurerm'
+      command: 'apply'
+      workingDirectory: '$(System.DefaultWorkingDirectory)/storage'
+      commandOptions: 'tfplan'
+      environmentServiceNameAzureRM: '$(subscription)'
+  - task: Bash@3
+    inputs:
     targetType: 'inline'
     script: |
-      ng test --no-watch --no-progress --browsers ChromeHeadless --code-coverage
-      ng build --configuration production
-
-# Generate Code Coverage Report
-#- task: reportgenerator@5
- # displayName: 'Generate Code Coverage Report'
-  #inputs:
-   # reports: 'coverage/angular-ecom/lcov.info'  # Adjust 'ecomm-project' to match your actual project folder name
-    #targetdir: 'coverage/angular-ecom/Reports'   # Specify where to output the report
-    #reporttypes: 'HtmlInline_AzureDevOps;Cobertura' # You can add other report types if needed
-
-# Publish Test Results
-#- task: PublishTestResults@2
- # displayName: 'Publish Test Results'
-  #inputs:
-   # testResultsFormat: 'JUnit'
-    #testResultsFiles: '$(Build.SourcesDirectory)/reports/junit.xml'
-
-# Publish Code Coverage
-#- task: PublishCodeCoverageResults@1
- # displayName: 'Publish Code Coverage'
- # inputs:
-  #  codeCoverageTool: 'Cobertura'
-   # summaryFileLocation: '$(Build.SourcesDirectory)\coverage\iRED-Web-Portal\cobertura-coverage.xml'
-   # reportDirectory: '$(Build.SourcesDirectory)\coverage\iRED-Web-Portal\Reports'
-
-# Archive Artifacts
-- task: ArchiveFiles@2
-  displayName: 'Archive Artifacts'
-  inputs:
-    rootFolderOrFile: '$(Build.SourcesDirectory)'
-    includeRootFolder: false
-    archiveType: 'zip'
-    archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
-    replaceExistingArchive: true
-
-# Publish Build Artifacts
-#- task: PublishBuildArtifacts@1
- # displayName: 'Publish Artifacts'
-  #inputs:
-   # PathtoPublish: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
-    #ArtifactName: 'drop'
-   # publishLocation: 'Container'
-
-# Send Slack Notification
-#- task: Bash@3
- # displayName: 'Send Slack Notification'
-  #inputs:
-   # targetType: 'inline'
-    #script: |
-     # curl -X POST -H 'Content-type: application/json' --data '{"text":"Build $(Build.BuildId) for Angular SPA is successful."}' https://app.slack.com/client/T07QJGPAAJ0/D07QG2M9T34
-#- task: SlackNotification@6
-#  inputs:
-#    SlackApiToken: 'xoxe.xoxp-1-Mi0yLTc4MzQ1NjczNTA2MTItNzgzMjA2NTk4MzQ1OC03ODU1MTE3NjE0NDgwLTc4NDUxNDM2ODA5NzctZWJjZjhkZTFlZWQ2YzE0NTZlY2U5Y2IxYmNmNGUxOGZkZWJiN2YxYjBjNjQ0NmU1NTQ2YmI4ZmQzYmI3ZTNhMQ'
-#    MessageAuthor: 'Azure DevOps'
-#    Channel: '#an-angular-project'
-#    NotificationType: 'ChatMessage'
-#    Message: 'tnekna'
+      resource_group_tags=$(az group show --name $(azurerm_resource_group.rg.name) --query 'tags' --output json)
+      echo "##vso[task.setvariable variable=ResourceGroupTags]$resource_group_tags"
