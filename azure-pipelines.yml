@@ -2,7 +2,7 @@ trigger:
 - main
 
 pool:
-  vmImage: 'ubuntu-latest'  # Use Ubuntu instead of Windows
+  name: 'Default'
 
 steps:
 # Use Node.js 16
