@@ -1,5 +1,5 @@
 resource_group_name    = "landing_zone"
-location               = "France Central"
+location               = "eastus"
 cluster_name        = "tap-app-1-aks-d"
 kubernetes_version  = "1.25.6"
 system_node_count   = 3
