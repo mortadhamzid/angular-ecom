@@ -55,7 +55,8 @@ steps:
       PathtoPublish: '$(Build.ArtifactStagingDirectory)'
       ArtifactName: '$(artifactName)'
 
-  - task: TerraformInstaller@0
+
+  - task: TerraformInstaller@1
     displayName: install Terraform 
     inputs:
       azureSubscription: AzureForStudentsConnection
