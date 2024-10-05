@@ -5,13 +5,13 @@ branches:
     source-branches: 
       - main
       - master
-    tag: 'feature'
+    label: 'feature'
   bugfix: 
     regex: ^bugfix[/-] 
     source-branches: 
       - main
       - master
-    tag: 'bugfix'
+    label: 'bugfix'
 ignore: 
   sha: [] 
 merge-message-formats: {}
