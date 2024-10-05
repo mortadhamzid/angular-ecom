@@ -2,7 +2,7 @@ trigger:
 - main
 
 variables:
-  subscription: Visual Studio Enterprise(5af9f377-83c8-4ec8-8520-953f65104850)
+  subscription: AzureForStudentsConnection
   resourceGroup: tap-app-1-aks-d
   storageAccount: tapapp1std
   container: tfstate
@@ -12,21 +12,20 @@ variables:
   # productRequester : '${{ Build.QueuedBy }}'
   productVersion: '$(GitVersion.SemVer)'
   
-jobs: 
-- job: BuildAndTest
-  workspace: 
-    clean: all 
-  pool: default
-  steps: 
-  - checkout: self
-    fetchDepth: 0
-  - task: gitversion/execute@0
+
+pool:
+  name: 'Default'
+
+steps: 
+ 
+  - task: gitversion/execute@3
     inputs:
-      azureSubscription: Visual Studio Enterprise(5af9f377-83c8-4ec8-8520-953f65104850)
+      azureSubscription: AzureForStudentsConnection
       useConfigFile: true 
       configFilePath: './GitVersion.yml'
   - script: echo current version is $(productVersion) 
     displayName: 'Display calculated version' 
+    
   - task: Bash@3 
     inputs: 
       targetType: inline 
@@ -35,26 +34,27 @@ jobs:
   - task: CopyFiles@2
     displayName: Copy files
     inputs:
-      azureSubscription: Visual Studio Enterprise(5af9f377-83c8-4ec8-8520-953f65104850)
+      azureSubscription: AzureForStudentsConnection
       SourceFolder: '$(Build.SourcesDirectory)'
       Contents: '*.json'
       TargetFolder: '$(Build.ArtifactStagingDirectory)'
   - task: PublishBuildArtifacts@1
     displayName:  Publish build artifacts
     inputs:
-      azureSubscription: Visual Studio Enterprise(5af9f377-83c8-4ec8-8520-953f65104850)
+      azureSubscription: AzureForStudentsConnection
 
       PathtoPublish: '$(Build.ArtifactStagingDirectory)'
       ArtifactName: '$(artifactName)'
+
   - task: TerraformInstaller@0
     displayName: install Terraform 
     inputs:
-      azureSubscription: Visual Studio Enterprise(5af9f377-83c8-4ec8-8520-953f65104850)
+      azureSubscription: AzureForStudentsConnection
       terraformVersion: 'latest'
   - task: TerraformTaskV1@0
     displayName: terraform init
     inputs:
-      azureSubscription: Visual Studio Enterprise(5af9f377-83c8-4ec8-8520-953f65104850)
+      azureSubscription: AzureForStudentsConnection
       provider: 'azurerm'
       command: 'init'
       workingDirectory: '$(System.DefaultWorkingDirectory)/storage'
@@ -66,26 +66,27 @@ jobs:
   - task: TerraformTaskV1@0
     displayName: terraform plan -out=tfplan
     inputs:
-      azureSubscription: Visual Studio Enterprise(5af9f377-83c8-4ec8-8520-953f65104850)
+      azureSubscription: AzureForStudentsConnection
       provider: 'azurerm'
       command: 'plan'
       workingDirectory: '$(System.DefaultWorkingDirectory)/storage'
       commandOptions: '-out=tfplan'
       # commandOptions: '-detailed-exitcode -out=tfplan'
-      environmentServiceNameAzureRM: '$(subscriptionName)'
+      environmentServiceNameAzureRM: '$(subscription)'
   - task: TerraformTaskV1@0
     displayName: terraform apply tfplan
     condition: eq(variables.anyTfChanges, true)
     inputs:
-      azureSubscription: Visual Studio Enterprise(5af9f377-83c8-4ec8-8520-953f65104850)
+      azureSubscription: AzureForStudentsConnection
       provider: 'azurerm'
       command: 'apply'
       workingDirectory: '$(System.DefaultWorkingDirectory)/storage'
       commandOptions: 'tfplan'
       environmentServiceNameAzureRM: '$(subscription)'
+
   - task: Bash@3
     inputs:
-    targetType: 'inline'
-    script: |
-      resource_group_tags=$(az group show --name $(azurerm_resource_group.rg.name) --query 'tags' --output json)
-      echo "##vso[task.setvariable variable=ResourceGroupTags]$resource_group_tags"
+      targetType: 'inline'
+      script: |
+        resource_group_tags=$(az group show --name $(azurerm_resource_group.rg.name) --query 'tags' --output json)
+               echo "##vso[task.setvariable variable=ResourceGroupTags]$resource_group_tags"
