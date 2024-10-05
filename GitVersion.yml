@@ -2,10 +2,16 @@ mode: Mainline
 branches: 
   feature: 
     regex: ^feature[/-] 
-    source-branches: ['main','master']
-  fix: 
+    source-branches: 
+      - main
+      - master
+    tag: 'feature'
+  bugfix: 
     regex: ^bugfix[/-] 
-    source-branches: ['main','master'] 
+    source-branches: 
+      - main
+      - master
+    tag: 'bugfix'
 ignore: 
   sha: [] 
 merge-message-formats: {}
