@@ -3,8 +3,8 @@ trigger:
 
 variables:
   subscription: AzureForStudentsConnection
-  resourceGroup: tap-app-1-aks-d
-  storageAccount: tapapp1std
+  resourceGroup: hellcap-app-dev-rg
+  storageAccount: stoarageacc177
   container: tfstate
   anyTfChanges: false
   tfstateFile: app-1-aks-d.tfstate
@@ -67,7 +67,7 @@ steps:
       azureSubscription: AzureForStudentsConnection
       provider: 'azurerm'
       command: 'init'
-      workingDirectory: '$(System.DefaultWorkingDirectory)/storage'
+      workingDirectory: '$(System.DefaultWorkingDirectory)/Storage'
       backendServiceArm: '$(subscription)'
       backendAzureRmResourceGroupName: '$(resourceGroup)'
       backendAzureRmStorageAccountName: '$(storageAccount)'
