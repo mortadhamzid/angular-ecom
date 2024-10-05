@@ -1,5 +1,5 @@
 trigger: 
-- main
+- bugfix-habib
 
 variables:
   subscription: AzureForStudentsConnection
