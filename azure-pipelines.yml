@@ -16,7 +16,10 @@ variables:
 pool:
   name: 'Default'
 
-steps: 
+steps:
+  # Disable shallow cloning
+  - checkout: self
+    fetchDepth: 0 
  
   - task: gitversion/execute@3
     inputs:
