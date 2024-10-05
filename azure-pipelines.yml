@@ -24,7 +24,7 @@ steps:
   - task: UseDotNet@2
     inputs:
       packageType: 'sdk'
-      version: '7.x.x'   # Adjust the version to match your needs (e.g., '7.x.x' or '6.x.x')
+      version: '7.x'   # Adjust the version to match your needs (e.g., '7.x.x' or '6.x.x')
       installationPath: $(Agent.ToolsDirectory)/dotnet
   - task: gitversion/execute@3
     inputs:
