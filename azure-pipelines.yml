@@ -18,6 +18,8 @@ pool:
 
 steps: 
  
+  - checkout: self
+    fetchDepth: 0 
   - task: gitversion/execute@3
     inputs:
       azureSubscription: AzureForStudentsConnection
