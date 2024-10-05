@@ -1,5 +1,5 @@
 trigger: 
-- main
+- feature-habib
 
 variables:
   subscription: AzureForStudentsConnection
