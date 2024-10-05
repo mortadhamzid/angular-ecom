@@ -1,17 +1,35 @@
-mode: Mainline 
-branches: 
-  feature: 
-    regex: ^feature[/-] 
-    source-branches: 
+mode: TrunkBased
+
+branches:
+  main:
+    regex: ^(main|master)$
+    label: ''
+    increment: Minor
+    prevent-increment-of-merged-branch-version: true
+    tracks-release-branches: true
+    is-mainline: true
+
+  feature:
+    regex: ^feature[/-]
+    source-branches:
       - main
-      - master
     label: 'feature'
-  bugfix: 
-    regex: ^bugfix[/-] 
-    source-branches: 
+    increment: Patch
+    prevent-increment-of-merged-branch-version: true
+    is-mainline: false
+
+  bugfix:
+    regex: ^bugfix[/-]
+    source-branches:
       - main
-      - master
     label: 'bugfix'
-ignore: 
-  sha: [] 
-merge-message-formats: {}
+    increment: Patch
+    prevent-increment-of-merged-branch-version: true
+    is-mainline: false
+
+
+ignore:
+  sha: []
+
+merge-message-formats:
+  merge: '{MergeBranch} merged into {TargetBranch}'
