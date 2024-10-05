@@ -3,7 +3,7 @@ trigger:
 
 variables:
   subscription: AzureForStudentsConnection
-  resourceGroup: hellcap-app-dev-rg
+  resourceGroup: landing_zone
   storageAccount: stoarageacc177
   container: tfstate
   anyTfChanges: false
