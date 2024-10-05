@@ -5,7 +5,8 @@ branches:
     regex: ^(main|master)$
     label: ''
     increment: Minor
-    prevent-increment-of-merged-branch-version: true
+    prevent-increment:
+      of-merged-branch: true
     tracks-release-branches: true
     is-mainline: true
 
@@ -15,7 +16,8 @@ branches:
       - main
     label: 'feature'
     increment: Patch
-    prevent-increment-of-merged-branch-version: true
+    prevent-increment:
+      of-merged-branch: true
     is-mainline: false
 
   bugfix:
@@ -24,7 +26,8 @@ branches:
       - main
     label: 'bugfix'
     increment: Patch
-    prevent-increment-of-merged-branch-version: true
+    prevent-increment:
+      of-merged-branch: true
     is-mainline: false
 
 
