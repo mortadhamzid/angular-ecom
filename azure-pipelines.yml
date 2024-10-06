@@ -80,7 +80,6 @@ steps:
   - task: TerraformTaskV1@0
     displayName: terraform plan -out=tfplan
     inputs:
-      azureSubscription: AzureForStudentsConnection
       provider: 'azurerm'
       command: 'plan'
       workingDirectory: '$(System.DefaultWorkingDirectory)/storage'
@@ -91,7 +90,6 @@ steps:
     displayName: terraform apply tfplan
     condition: eq(variables.anyTfChanges, true)
     inputs:
-      azureSubscription: AzureForStudentsConnection
       provider: 'azurerm'
       command: 'apply'
       workingDirectory: '$(System.DefaultWorkingDirectory)/storage'
