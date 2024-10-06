@@ -63,7 +63,7 @@ steps:
   - task: TerraformInstaller@1
     displayName: install Terraform 
     inputs:
-      azureSubscription: AzureForStudentsConnection
+      azureSubscription: '$(subscription)'
       terraformVersion: '1.9.7'
   - task: TerraformTaskV1@0
     displayName: terraform init
