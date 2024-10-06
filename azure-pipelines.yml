@@ -39,11 +39,11 @@ steps:
 #  - script: echo current version is $(productVersion) 
 #    displayName: 'Display calculated version' 
     
-  - task: Bash@3 
-    inputs: 
-      targetType: inline 
-      script: echo "##vso[build.updatebuildnumber]$(SemVer)" 
-    displayName: 'Update build number'
+#  - task: Bash@3 
+#    inputs: 
+#      targetType: inline 
+#      script: echo "##vso[build.updatebuildnumber]$(SemVer)" 
+#    displayName: 'Update build number'
   - task: CopyFiles@2
     displayName: Copy files
     inputs:
