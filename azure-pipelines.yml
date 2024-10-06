@@ -118,5 +118,5 @@ steps:
      kubernetesCluster: 'example-aks1'
      namespace: 'default'
      manifests: |
-       deployment.yaml'
-       service.yaml'
+       deployment.yaml
+       service.yaml
