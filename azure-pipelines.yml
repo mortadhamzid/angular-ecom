@@ -25,11 +25,11 @@ steps:
   - checkout: self
     fetchDepth: 0 
 
-  - task: gitversion/execute@3
-    inputs:
-     useConfigFile: true
-     configFilePath: './GitVersion.yml'
-     overrideConfig: 'next-version=1.0.0'
+#  - task: gitversion/execute@3
+#    inputs:
+#     useConfigFile: true
+#     configFilePath: './GitVersion.yml'
+#     overrideConfig: 'next-version=1.0.0'
   
 #- task: gitversion/execute@3
 #    inputs:
