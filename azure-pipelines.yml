@@ -15,6 +15,8 @@ variables:
   CLIENT_SECRET: $(terraform2)
   SUBSCRIPTION_ID: '90e9e45d-3b55-41f9-b350-aef4bb03ea3c'
   TENANT_ID: '9680b44d-d7ce-46a6-bf0d-6a6b6ec1ae9a'
+  aksResourceGroup: 'example-resources'  # Resource group containing your AKS
+  aksClusterName: 'example-aks1'
   
 
 pool:
@@ -101,3 +103,30 @@ steps:
       script: |
         resource_group_tags=$(az group show --name $(azurerm_resource_group.rg.name) --query 'tags' --output json)
                echo "##vso[task.setvariable variable=ResourceGroupTags]$resource_group_tags"
+
+  - task: AzureCLI@2
+    displayName: 'Install kubectl'
+    inputs:
+        azureSubscription: AzureForStudentsConnection
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: 'az aks install-cli'
+
+  - task: AzureCLI@2
+    displayName: 'Set AKS context'
+    inputs:
+        azureSubscription: AzureForStudentsConnection
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          az aks get-credentials --resource-group $(aksResourceGroup) --name $(aksClusterName) --overwrite-existing
+
+  - task: AzureCLI@2
+    displayName: 'Deploy application to AKS'
+    inputs:
+        azureSubscription: AzureForStudentsConnection
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          kubectl apply -f path/to/your/deployment.yaml
+          kubectl apply -f path/to/your/service.yaml
