@@ -71,7 +71,7 @@ steps:
       azureSubscription:  $(subscription)
       provider: 'azurerm'
       command: 'init'
-      workingDirectory: '$(System.DefaultWorkingDirectory)/Storage'
+      workingDirectory: $(System.DefaultWorkingDirectory)
       backendServiceArm: $(subscription)
       backendAzureRmResourceGroupName: $(resourceGroup)
       backendAzureRmStorageAccountName: $(storageAccount)
@@ -82,7 +82,7 @@ steps:
     inputs:
       provider: 'azurerm'
       command: 'plan'
-      workingDirectory: '$(System.DefaultWorkingDirectory)/Storage'
+      workingDirectory: $(System.DefaultWorkingDirectory)
       commandOptions: '-out=tfplan -detailed-exitcode -out=tfplan'
       environmentServiceNameAzureRM: $(subscription)
   - task: TerraformTaskV1@2
@@ -91,7 +91,7 @@ steps:
     inputs:
       provider: 'azurerm'
       command: 'apply'
-      workingDirectory: '$(System.DefaultWorkingDirectory)/Storage'
+      workingDirectory: $(System.DefaultWorkingDirectory)
       commandOptions: 'tfplan'
       environmentServiceNameAzureRM: $(subscription)
 
