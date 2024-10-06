@@ -65,19 +65,19 @@ steps:
 
       terraformVersion: '1.9.7'
   
-  - task: TerraformTaskV1@0
+  - task: TerraformTaskV1@2
     displayName: terraform init
     inputs:
-      azureSubscription: AzureForStudentsConnection
+      azureSubscription:  $(subscription)
       provider: 'azurerm'
       command: 'init'
       workingDirectory: '$(System.DefaultWorkingDirectory)/Storage'
-      backendServiceArm: '$(subscription)'
-      backendAzureRmResourceGroupName: '$(resourceGroup)'
-      backendAzureRmStorageAccountName: '$(storageAccount)'
-      backendAzureRmContainerName: '$(container)'
-      backendAzureRmKey: '$(tfstateFile)'
-  - task: TerraformTaskV1@0
+      backendServiceArm: $(subscription)
+      backendAzureRmResourceGroupName: $(resourceGroup)
+      backendAzureRmStorageAccountName: $(storageAccount)
+      backendAzureRmContainerName: $(container)
+      backendAzureRmKey: $(tfstateFile)
+  - task: TerraformTaskV1@2
     displayName: terraform plan -out=tfplan
     inputs:
       provider: 'azurerm'
@@ -85,8 +85,8 @@ steps:
       workingDirectory: '$(System.DefaultWorkingDirectory)/storage'
       commandOptions: '-out=tfplan'
       # commandOptions: '-detailed-exitcode -out=tfplan'
-      environmentServiceNameAzureRM: '$(subscription)'
-  - task: TerraformTaskV1@0
+      environmentServiceNameAzureRM: $(subscription)
+  - task: TerraformTaskV1@2
     displayName: terraform apply tfplan
     condition: eq(variables.anyTfChanges, true)
     inputs:
@@ -94,7 +94,7 @@ steps:
       command: 'apply'
       workingDirectory: '$(System.DefaultWorkingDirectory)/storage'
       commandOptions: 'tfplan'
-      environmentServiceNameAzureRM: '$(subscription)'
+      environmentServiceNameAzureRM: $(subscription)
 
   - task: Bash@3
     inputs:
