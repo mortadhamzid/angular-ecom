@@ -5,7 +5,6 @@ kubernetes_version  = "1.25.6"
 system_node_count   = 3
 node_resource_group = "tap-app-1-nod-d"
 env = "DEV"
-productName = "AKS"
 ProductRequester = "mortadhamziid@gmail.com"
 provisioningDate = "05/10/2024"
 productVersion = "1.0.0"
