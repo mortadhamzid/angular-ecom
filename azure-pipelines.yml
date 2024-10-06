@@ -11,7 +11,7 @@ variables:
   artifactName: 'variables' 
   # productRequester : '${{ Build.QueuedBy }}'
   productVersion: '$(GitVersion.SemVer)'
-  CLIENT_ID: 'ed4b67b9-3f8c-4557-a031-fbb7bb765f79'
+  CLIENT_ID: '5c593317-0600-4d4d-ad83-0a13ae63b6da'
   CLIENT_SECRET: $(Terraform)
   SUBSCRIPTION_ID: '90e9e45d-3b55-41f9-b350-aef4bb03ea3c'
   TENANT_ID: '9680b44d-d7ce-46a6-bf0d-6a6b6ec1ae9a'
