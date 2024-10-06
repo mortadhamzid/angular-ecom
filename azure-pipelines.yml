@@ -109,22 +109,14 @@ steps:
      kubectlVersion: 'latest'
 
 
-  - task: AzureCLI@2
-    displayName: 'Set AKS context'
+  - task: KubernetesManifest@1
     inputs:
-        azureSubscription: AzureForStudentsConnection
-        scriptType: 'bash'
-        scriptLocation: 'inlineScript'
-        inlineScript: |
-          az login --service-principal -u "ed4b67b9-3f8c-4557-a031-fbb7bb765f79" -p "Qyx8Q~x8Ts67soi0wDcOKTBT0qSO~6QOemuJEbXX" --tenant "9680b44d-d7ce-46a6-bf0d-6a6b6ec1ae9a"
-          --resource-group $(aksResourceGroup) --name $(aksClusterName) --overwrite-existing
-
-  - task: AzureCLI@2
-    displayName: 'Deploy application to AKS'
-    inputs:
-        azureSubscription: AzureForStudentsConnection
-        scriptType: 'bash'
-        scriptLocation: 'inlineScript'
-        inlineScript: |
-          kubectl apply -f path/to/your/deployment.yaml
-          kubectl apply -f path/to/your/service.yaml
+     action: 'deploy'
+     connectionType: 'azureResourceManager'
+     azureSubscriptionConnection: 'AzureForStudentsConnection'
+     azureResourceGroup: 'example-resources'
+     kubernetesCluster: 'example-aks1'
+     namespace: 'default'
+     manifests: |
+       '$(System.DefaultWorkingDirectory)/deployment.yaml'
+       '$(System.DefaultWorkingDirectory)/service.yaml'
