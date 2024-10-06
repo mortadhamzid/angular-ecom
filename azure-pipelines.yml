@@ -87,12 +87,12 @@ steps:
       environmentServiceNameAzureRM: $(subscription)
   - task: TerraformTaskV1@2
     displayName: terraform apply tfplan
-    condition: eq(variables.anyTfChanges, true)
+    #condition: eq(variables.anyTfChanges, true)
     inputs:
       provider: 'azurerm'
       command: 'apply'
       workingDirectory: $(System.DefaultWorkingDirectory)
-      commandOptions: 'tfplan'
+      commandOptions: 'tfplan -auto-approve'
       environmentServiceNameAzureRM: $(subscription)
 
   - task: Bash@3
