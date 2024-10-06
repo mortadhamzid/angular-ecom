@@ -33,10 +33,7 @@ variable "env" {
   description = "environnement"
 }
 
-variable "ProductName" {
-  type        = string
-  description = "AKS"
-}
+
 
 variable "ProductRequester" {
   type        = string
