@@ -64,7 +64,7 @@ steps:
     displayName: install Terraform 
     inputs:
       azureSubscription: AzureForStudentsConnection
-      terraformVersion: 'latest'
+      terraformVersion: '0.13.5'
   - task: TerraformTaskV1@0
     displayName: terraform init
     inputs:
