@@ -82,7 +82,7 @@ steps:
     inputs:
       provider: 'azurerm'
       command: 'plan'
-      workingDirectory: '$(System.DefaultWorkingDirectory)/storage'
+      workingDirectory: '$(System.DefaultWorkingDirectory)/Storage'
       commandOptions: '-out=tfplan'
       # commandOptions: '-detailed-exitcode -out=tfplan'
       environmentServiceNameAzureRM: $(subscription)
@@ -92,7 +92,7 @@ steps:
     inputs:
       provider: 'azurerm'
       command: 'apply'
-      workingDirectory: '$(System.DefaultWorkingDirectory)/storage'
+      workingDirectory: '$(System.DefaultWorkingDirectory)/Storage'
       commandOptions: 'tfplan'
       environmentServiceNameAzureRM: $(subscription)
 
