@@ -3,36 +3,47 @@ trigger:
 
 variables:
   subscription: AzureForStudentsConnection
-  resourceGroup: tap-app-1-aks-d
-  storageAccount: tapapp1std
+  resourceGroup: landing_zone
+  storageAccount: stoarageacc177
   container: tfstate
   anyTfChanges: false
   tfstateFile: app-1-aks-d.tfstate
   artifactName: 'variables' 
   # productRequester : '${{ Build.QueuedBy }}'
   productVersion: '$(GitVersion.SemVer)'
+  CLIENT_ID: '5c593317-0600-4d4d-ad83-0a13ae63b6da'
+  CLIENT_SECRET: $(terraform2)
+  SUBSCRIPTION_ID: '90e9e45d-3b55-41f9-b350-aef4bb03ea3c'
+  TENANT_ID: '9680b44d-d7ce-46a6-bf0d-6a6b6ec1ae9a'
   
 
 pool:
   name: 'Default'
 
-steps: 
+steps:
+  # Disable shallow cloning
   - checkout: self
     fetchDepth: 0 
- 
-  - task: gitversion/execute@3
-    inputs:
-      azureSubscription: AzureForStudentsConnection
-      useConfigFile: true 
-      configFilePath: './GitVersion.yml'
-  - script: echo current version is $(productVersion) 
-    displayName: 'Display calculated version' 
+
+#  - task: gitversion/execute@3
+#    inputs:
+#     useConfigFile: true
+#     configFilePath: './GitVersion.yml'
+#     overrideConfig: 'next-version=1.0.0'
+  
+#- task: gitversion/execute@3
+#    inputs:
+#      azureSubscription: AzureForStudentsConnection
+#      useConfigFile: true 
+#      configFilePath: './GitVersion.yml'
+#  - script: echo current version is $(productVersion) 
+#    displayName: 'Display calculated version' 
     
-  - task: Bash@3 
-    inputs: 
-      targetType: inline 
-      script: echo "##vso[build.updatebuildnumber]$(SemVer)" 
-    displayName: 'Update build number'
+#  - task: Bash@3 
+#    inputs: 
+#      targetType: inline 
+#      script: echo "##vso[build.updatebuildnumber]$(SemVer)" 
+#    displayName: 'Update build number'
   - task: CopyFiles@2
     displayName: Copy files
     inputs:
@@ -48,43 +59,41 @@ steps:
       PathtoPublish: '$(Build.ArtifactStagingDirectory)'
       ArtifactName: '$(artifactName)'
 
-  - task: TerraformInstaller@0
-    displayName: install Terraform 
+  - task: TerraformInstaller@1
     inputs:
       azureSubscription: AzureForStudentsConnection
-      terraformVersion: 'latest'
-  - task: TerraformTaskV1@0
+
+      terraformVersion: '1.9.7'
+  
+  - task: TerraformTaskV1@2
     displayName: terraform init
     inputs:
-      azureSubscription: AzureForStudentsConnection
+      azureSubscription:  $(subscription)
       provider: 'azurerm'
       command: 'init'
-      workingDirectory: '$(System.DefaultWorkingDirectory)/storage'
-      backendServiceArm: '$(subscription)'
-      backendAzureRmResourceGroupName: '$(resourceGroup)'
-      backendAzureRmStorageAccountName: '$(storageAccount)'
-      backendAzureRmContainerName: '$(container)'
-      backendAzureRmKey: '$(tfstateFile)'
-  - task: TerraformTaskV1@0
+      workingDirectory: $(System.DefaultWorkingDirectory)
+      backendServiceArm: $(subscription)
+      backendAzureRmResourceGroupName: $(resourceGroup)
+      backendAzureRmStorageAccountName: $(storageAccount)
+      backendAzureRmContainerName: $(container)
+      backendAzureRmKey: $(tfstateFile)
+  - task: TerraformTaskV1@2
     displayName: terraform plan -out=tfplan
     inputs:
-      azureSubscription: AzureForStudentsConnection
       provider: 'azurerm'
       command: 'plan'
-      workingDirectory: '$(System.DefaultWorkingDirectory)/storage'
-      commandOptions: '-out=tfplan'
-      # commandOptions: '-detailed-exitcode -out=tfplan'
-      environmentServiceNameAzureRM: '$(subscription)'
-  - task: TerraformTaskV1@0
+      workingDirectory: $(System.DefaultWorkingDirectory)
+      commandOptions: '-out=tfplan -detailed-exitcode -out=tfplan'
+      environmentServiceNameAzureRM: $(subscription)
+  - task: TerraformTaskV1@2
     displayName: terraform apply tfplan
     condition: eq(variables.anyTfChanges, true)
     inputs:
-      azureSubscription: AzureForStudentsConnection
       provider: 'azurerm'
       command: 'apply'
-      workingDirectory: '$(System.DefaultWorkingDirectory)/storage'
+      workingDirectory: $(System.DefaultWorkingDirectory)
       commandOptions: 'tfplan'
-      environmentServiceNameAzureRM: '$(subscription)'
+      environmentServiceNameAzureRM: $(subscription)
 
   - task: Bash@3
     inputs:
