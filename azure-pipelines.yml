@@ -18,7 +18,7 @@ variables:
   
 
 pool:
-  name: 'Default'
+  name: 'agentAngular'
 
 steps:
   # Disable shallow cloning
@@ -61,7 +61,7 @@ steps:
 
   - task: TerraformInstaller@1
     inputs:
-      terraformVersion: 'latest'
+      terraformVersion: '1.9.7'
   
   - task: TerraformTaskV1@0
     displayName: terraform init
