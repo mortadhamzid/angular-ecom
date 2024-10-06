@@ -18,7 +18,7 @@ variables:
   
 
 pool:
-  name: 'agentAngular'
+  name: 'Default'
 
 steps:
   # Disable shallow cloning
