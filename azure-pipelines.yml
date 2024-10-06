@@ -87,7 +87,7 @@ steps:
       environmentServiceNameAzureRM: $(subscription)
   - task: TerraformTaskV1@2
     displayName: terraform apply tfplan
-    condition: eq(variables.anyTfChanges, true)
+    #condition: eq(variables.anyTfChanges, true)
     inputs:
       provider: 'azurerm'
       command: 'apply'
