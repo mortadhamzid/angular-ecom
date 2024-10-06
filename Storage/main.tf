@@ -4,7 +4,6 @@ resource "azurerm_resource_group" "rg" {
 
   tags = {
     env = var.env
-    ProductName = var.ProductName
     ProductRequester = var.ProductRequester
     provisioningDate = var.provisioningDate 
     productVersion = var.productVersion
