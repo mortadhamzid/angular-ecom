@@ -1,6 +1,5 @@
 trigger: 
 - bugfix-habib
-
 variables:
   subscription: AzureForStudentsConnection
   resourceGroup: landing_zone
@@ -9,114 +8,229 @@ variables:
   anyTfChanges: false
   tfstateFile: app-1-aks-d.tfstate
   artifactName: 'variables' 
-  # productRequester : '${{ Build.QueuedBy }}'
+  productRequester : '${{ Build.QueuedBy }}'
   productVersion: '$(GitVersion.SemVer)'
   CLIENT_ID: '5c593317-0600-4d4d-ad83-0a13ae63b6da'
   CLIENT_SECRET: $(terraform2)
   SUBSCRIPTION_ID: '90e9e45d-3b55-41f9-b350-aef4bb03ea3c'
   TENANT_ID: '9680b44d-d7ce-46a6-bf0d-6a6b6ec1ae9a'
-  aksResourceGroup: 'example-resources'  # Resource group containing your AKS
+  aksResourceGroup: 'example-resources'  
   aksClusterName: 'example-aks1'
-  
-
+  Angular-Project-Name: $(AngularName)
+  angular-project-key: $(SonarKey)
+  SonarQubeServiceConnection: $(SonarConnection)
+  docker-service-connection: $(DockerConnection)
+  imageName: $(ImageAngular)
 pool:
   name: 'Default'
-
-steps:
+steps:   
   # Disable shallow cloning
-  - checkout: self
+- checkout: self
     fetchDepth: 0 
-
-#  - task: gitversion/execute@3
-#    inputs:
-#     useConfigFile: true
-#     configFilePath: './GitVersion.yml'
-#     overrideConfig: 'next-version=1.0.0'
-  
-#- task: gitversion/execute@3
-#    inputs:
-#      azureSubscription: AzureForStudentsConnection
-#      useConfigFile: true 
-#      configFilePath: './GitVersion.yml'
-#  - script: echo current version is $(productVersion) 
-#    displayName: 'Display calculated version' 
-    
-#  - task: Bash@3 
-#    inputs: 
-#      targetType: inline 
-#      script: echo "##vso[build.updatebuildnumber]$(SemVer)" 
-#    displayName: 'Update build number'
-  - task: CopyFiles@2
-    displayName: Copy files
-    inputs:
-      azureSubscription: AzureForStudentsConnection
-      SourceFolder: '$(Build.SourcesDirectory)'
-      Contents: '*.json'
-      TargetFolder: '$(Build.ArtifactStagingDirectory)'
-  - task: PublishBuildArtifacts@1
-    displayName:  Publish build artifacts
-    inputs:
-      azureSubscription: AzureForStudentsConnection
-
-      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-      ArtifactName: '$(artifactName)'
-
-  - task: TerraformInstaller@1
-    inputs:
-      azureSubscription: AzureForStudentsConnection
-
-      terraformVersion: '1.9.7'
-  
-  - task: TerraformTaskV1@2
-    displayName: terraform init
-    inputs:
-      azureSubscription:  $(subscription)
-      provider: 'azurerm'
-      command: 'init'
-      workingDirectory: $(System.DefaultWorkingDirectory)
-      backendServiceArm: $(subscription)
-      backendAzureRmResourceGroupName: $(resourceGroup)
-      backendAzureRmStorageAccountName: $(storageAccount)
-      backendAzureRmContainerName: $(container)
-      backendAzureRmKey: $(tfstateFile)
-  - task: TerraformTaskV1@2
-    displayName: terraform plan -out=tfplan
-    inputs:
-      provider: 'azurerm'
-      command: 'plan'
-      workingDirectory: $(System.DefaultWorkingDirectory)
-      commandOptions: '-out=tfplan -detailed-exitcode -out=tfplan'
-      environmentServiceNameAzureRM: $(subscription)
-  - task: TerraformTaskV1@2
-    displayName: terraform apply tfplan
-    condition: eq(variables.anyTfChanges, true)
-    inputs:
-      provider: 'azurerm'
-      command: 'apply'
-      workingDirectory: $(System.DefaultWorkingDirectory)
-      commandOptions: 'tfplan'
-      environmentServiceNameAzureRM: $(subscription)
-
-  - task: Bash@3
-    inputs:
-      targetType: 'inline'
-      script: |
-        resource_group_tags=$(az group show --name $(azurerm_resource_group.rg.name) --query 'tags' --output json)
-               echo "##vso[task.setvariable variable=ResourceGroupTags]$resource_group_tags"
-
-  - task: KubectlInstaller@0
-    inputs:
-     kubectlVersion: 'latest'
-
-
-  - task: KubernetesManifest@1
-    inputs:
-     action: 'deploy'
-     connectionType: 'azureResourceManager'
-     azureSubscriptionConnection: 'AzureForStudentsConnection'
-     azureResourceGroup: 'example-resources'
-     kubernetesCluster: 'example-aks1'
-     namespace: 'default'
-     manifests: |
-       deployment.yaml
-       service.yaml
+- task: gitversion/execute@3
+  inputs:
+    useConfigFile: true
+    configFilePath: './GitVersion.yml'
+    overrideConfig: 'next-version=1.0.0'     
+- task: Bash@3 
+  inputs: 
+    targetType: inline 
+    script: echo "##vso[build.updatebuildnumber]$(SemVer)" 
+  displayName: 'Update build number'
+# Use Node.js 16
+- task: UseNode@1
+  inputs:
+    version: '16.x'
+  displayName: 'Install Node.js 16'
+# Install npm 8 (comes with Node.js 16 by default)
+- task: Npm@1
+  displayName: 'Install npm 8'
+  inputs:
+    command: 'custom'
+    customCommand: 'install -g npm@8'
+# Install Angular CLI 14.1.3
+- task: Npm@1
+  displayName: 'Install Angular CLI 14.1.3'
+  inputs:
+    command: 'custom'
+    customCommand: 'install -g @angular/cli@14.1.3'
+# Install Dependencies
+- task: Npm@1
+  displayName: 'Install Dependencies'
+  inputs:
+    command: 'custom'
+    customCommand: 'install --legacy-peer-deps'
+# Install Snyk
+#- task: Npm@1
+#  displayName: 'Install Snyk'
+#  inputs:
+#    command: 'custom'
+#    customCommand: 'install -g snyk'
+- task: SnykSecurityScan@1
+  inputs:
+    serviceConnectionEndpoint: 'snyk'
+    testType: 'app'
+    monitorWhen: 'always'
+    failOnIssues: true
+# Run Snyk Security Test
+#- task: Bash@3
+#  displayName: 'Run Snyk Security Test'
+#  inputs:
+#    targetType: 'inline'
+#    script: |
+#      snyk auth $SNYK_TOKEN
+#      snyk test
+#      snyk monitor
+# Run Angular Tests and Build
+- task: Bash@3
+  displayName: 'Run Angular Tests and Build'
+  inputs:
+    targetType: 'inline'
+    script: |
+      ng test --no-watch --no-progress --browsers ChromeHeadless --code-coverage
+      ng build --configuration production
+- task: SnykSecurityScan@1
+  inputs:
+    serviceConnectionEndpoint: 'snyk'
+    testType: 'app'
+    monitorWhen: 'always'
+    failOnIssues: true
+- task: SonarQubePrepare@5
+  inputs:
+    SonarQube: $(SonarQubeServiceConnection)  
+    scannerMode: 'CLI'
+    configMode: 'manual'
+    cliProjectKey: $(angular-project-key)     
+    cliProjectName: $(Angular-Project-Name)
+    cliSources: 'src'                             
+    extraProperties: |
+      sonar.typescript.lcov.reportPaths=coverage/lcov.info    
+      sonar.testExecutionReportPaths=test-reports/sonar-report.xml 
+#Run SonarQube analysis (actual code scanning)
+- task: SonarQubeAnalyze@5
+#Publish Quality Gate Result on SonarQube
+- task: SonarQubePublish@5
+  inputs:
+    pollingTimeoutSec: '300'   
+# Generate Code Coverage Report
+#- task: reportgenerator@5
+ # displayName: 'Generate Code Coverage Report'
+  #inputs:
+   # reports: 'coverage/angular-ecom/lcov.info'  # Adjust 'ecomm-project' to match your actual project folder name
+    #targetdir: 'coverage/angular-ecom/Reports'   # Specify where to output the report
+    #reporttypes: 'HtmlInline_AzureDevOps;Cobertura' # You can add other report types if needed
+# Publish Test Results
+#- task: PublishTestResults@2
+ # displayName: 'Publish Test Results'
+  #inputs:
+   # testResultsFormat: 'JUnit'
+    #testResultsFiles: '$(Build.SourcesDirectory)/reports/junit.xml'
+# Publish Code Coverage
+#- task: PublishCodeCoverageResults@1
+ # displayName: 'Publish Code Coverage'
+ # inputs:
+  #  codeCoverageTool: 'Cobertura'
+   # summaryFileLocation: '$(Build.SourcesDirectory)\coverage\iRED-Web-Portal\cobertura-coverage.xml'
+   # reportDirectory: '$(Build.SourcesDirectory)\coverage\iRED-Web-Portal\Reports'
+# Archive Artifacts
+- task: ArchiveFiles@2
+  displayName: 'Archive Artifacts'
+  inputs:
+    rootFolderOrFile: '$(Build.SourcesDirectory)'
+    includeRootFolder: false
+    archiveType: 'zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+    replaceExistingArchive: true
+ #Publish Build Artifacts
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifacts'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
+- task: Docker@2
+  inputs:
+    containerRegistry: $(docker-service-connection)
+    command: 'build'
+    repository: '$(imageName)'
+    dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
+    tags: |
+      $(Build.BuildId)
+      latest
+# Docker Push with Authentication
+- task: Docker@2
+  inputs:
+    containerRegistry: $(docker-service-connection) 
+    command: 'push'
+    repository: '$(imageName)'
+    tags: |
+      $(Build.BuildId)
+      latest       
+#- task: CopyFiles@2
+  #displayName: Copy files
+  #inputs:
+   # azureSubscription: AzureForStudentsConnection
+    #SourceFolder: '$(Build.SourcesDirectory)'
+    #Contents: '*.json'
+    #TargetFolder: '$(Build.ArtifactStagingDirectory)'
+#- task: PublishBuildArtifacts@1
+ # displayName:  Publish build artifacts
+  #inputs:
+   # azureSubscription: AzureForStudentsConnection
+    #PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    #ArtifactName: '$(artifactName)'
+- task: TerraformInstaller@1
+  inputs:
+    azureSubscription: AzureForStudentsConnection
+    terraformVersion: '1.9.7'  
+- task: TerraformTaskV1@2
+  displayName: terraform init
+  inputs:
+    azureSubscription:  $(subscription)
+    provider: 'azurerm'
+    command: 'init'
+    workingDirectory: $(System.DefaultWorkingDirectory)
+    backendServiceArm: $(subscription)
+    backendAzureRmResourceGroupName: $(resourceGroup)
+    backendAzureRmStorageAccountName: $(storageAccount)
+    backendAzureRmContainerName: $(container)
+    backendAzureRmKey: $(tfstateFile)
+- task: TerraformTaskV1@2
+  displayName: terraform plan -out=tfplan
+  inputs:
+    provider: 'azurerm'
+    command: 'plan'
+    workingDirectory: $(System.DefaultWorkingDirectory)
+    commandOptions: '-out=tfplan -detailed-exitcode -out=tfplan'
+    environmentServiceNameAzureRM: $(subscription)
+- task: TerraformTaskV1@2
+  displayName: terraform apply tfplan
+  condition: eq(variables.anyTfChanges, true)
+  inputs:
+    provider: 'azurerm'
+    command: 'apply'
+    workingDirectory: $(System.DefaultWorkingDirectory)
+    commandOptions: 'tfplan'
+    environmentServiceNameAzureRM: $(subscription)
+- task: KubectlInstaller@0
+  inputs:
+    kubectlVersion: 'latest'
+- task: KubernetesManifest@1
+  inputs:
+    action: 'deploy'
+    connectionType: 'azureResourceManager'
+    azureSubscriptionConnection: 'AzureForStudentsConnection'
+    azureResourceGroup: 'example-resources'
+    kubernetesCluster: 'example-aks1'
+    namespace: 'default'
+    manifests: |
+      deployment.yaml
+      service.yaml
+# Send Slack Notification
+- task: SlackNotification@6
+  inputs:
+    SlackApiToken: 'xoxe.xoxp-1-Mi0yLTc4MzQ1NjczNTA2MTItNzgzMjA2NTk4MzQ1OC03ODU1MTE3NjE0NDgwLTc4NDUxNDM2ODA5NzctZWJjZjhkZTFlZWQ2YzE0NTZlY2U5Y2IxYmNmNGUxOGZkZWJiN2YxYjBjNjQ0NmU1NTQ2YmI4ZmQzYmI3ZTNhMQ'
+    MessageAuthor: 'Azure DevOps'
+    Channel: '#an-angular-project'
+    NotificationType: 'ChatMessage'
+    Message: 'check the results' 
